@@ -18,7 +18,7 @@ struct Club {
 enum Screen { TITLE, NEW_CAREER, DASHBOARD, SQUAD, TRANSFERS, LEAGUE, SCHEDULE };
 
 static Color BG={12,18,28,255}, PANEL={22,31,45,255}, PANEL2={29,41,58,255};
-static Color ACCENT={57,211,147,255}, MUTED={153,167,185,255}, GOLD={244,196,86,255};
+static Color ACCENT={57,211,147,255}, MUTED={153,167,185,255}, GOLD_C={244,196,86,255};
 static vector<Club> clubs;
 static int clubIndex=0, day=1, month=7, year=2026, inbox=3;
 static Screen screen=TITLE;
@@ -62,7 +62,7 @@ void Header(){
     DrawRectangle(0,0,1280,72,Color{15,23,35,255});
     Txt("DUMOK FOOTBALL MANAGER",28,20,26,ACCENT);
     Txt(DateStr(),925,24,18,MUTED);
-    Txt("Inbox "+to_string(inbox),1040,24,18,GOLD);
+    Txt("Inbox "+to_string(inbox),1040,24,18,GOLD_C);
     if(Btn(R(1145,15,110,42),"NEXT DAY")) AdvanceDay();
 }
 void Sidebar(){
@@ -93,13 +93,13 @@ void Dashboard(){
     Txt("• Develop young players",270,410,17,MUTED);
     Txt("• Reach cup quarter-final",270,443,17,MUTED);
     Txt("Recent news",255,495,17,RAYWHITE);
-    Txt("Scout recommends 3 new players",270,530,16,GOLD);
+    Txt("Scout recommends 3 new players",270,530,16,GOLD_C);
     Txt("Board welcomes the new manager",270,562,16,MUTED);
     Txt("Pre-season training begins",270,594,16,MUTED);
     DrawRectangleRounded(R(865,280,355,370),.04f,8,PANEL);
     Txt("KEY PLAYERS",885,300,20,ACCENT);
     auto s=c.squad; sort(s.begin(),s.end(),[](auto&a,auto&b){return a.ca>b.ca;});
-    int y=345; for(int i=0;i<5;i++){Txt(s[i].name,885,y,17,RAYWHITE);Txt(s[i].pos,1040,y,16,MUTED);Txt("CA "+to_string(s[i].ca),1100,y,16,GOLD);y+=48;}
+    int y=345; for(int i=0;i<5;i++){Txt(s[i].name,885,y,17,RAYWHITE);Txt(s[i].pos,1040,y,16,MUTED);Txt("CA "+to_string(s[i].ca),1100,y,16,GOLD_C);y+=48;}
 }
 void Squad(){
     Club &c=clubs[clubIndex]; Txt("FIRST TEAM SQUAD",235,100,30,RAYWHITE);
@@ -108,7 +108,7 @@ void Squad(){
     for(auto&p:c.squad){
         DrawRectangleRounded(R(235,y,985,38),.08f,6,(y/38)%2?PANEL:PANEL2);
         Txt(p.name,250,y+10,16,RAYWHITE);Txt(p.pos,520,y+10,16,ACCENT);Txt(to_string(p.age),595,y+10,16,RAYWHITE);
-        Txt(to_string(p.ca),670,y+10,16,GOLD);Txt(to_string(p.pa),740,y+10,16,MUTED);
+        Txt(to_string(p.ca),670,y+10,16,GOLD_C);Txt(to_string(p.pa),740,y+10,16,MUTED);
         Txt("£"+to_string(p.value)+"M",815,y+10,16,RAYWHITE);Txt("£"+to_string(p.wage)+"k",930,y+10,16,RAYWHITE);Txt(to_string(p.contract)+"y",1055,y+10,16,RAYWHITE); y+=42;
     }
 }
@@ -122,7 +122,7 @@ void Transfers(){
     for(int i=0;i<5;i++){
         DrawRectangleRounded(R(235,y,985,70),.06f,8,PANEL);
         Txt(n[i],255,y+14,19,RAYWHITE);Txt(p[i],255,y+41,15,ACCENT);
-        Txt("CA "+to_string(ca[i]),500,y+24,17,GOLD);Txt("PA "+to_string(pa[i]),590,y+24,17,MUTED);
+        Txt("CA "+to_string(ca[i]),500,y+24,17,GOLD_C);Txt("PA "+to_string(pa[i]),590,y+24,17,MUTED);
         Txt("£"+to_string(val[i])+"M",710,y+24,17,RAYWHITE);
         if(Btn(R(1010,y+14,180,42),"MAKE OFFER")){toast="이적 제안을 보냈습니다";toastT=2;}
         y+=84;
@@ -134,7 +134,7 @@ void League(){
     sort(order.rbegin(),order.rend());
     int y=165, rank=1;
     for(auto &o:order){ auto &c=clubs[o.second]; DrawRectangleRounded(R(235,y,800,48),.05f,6,o.second==clubIndex?Color{35,72,64,255}:PANEL);
-        Txt(to_string(rank),255,y+15,16,MUTED);Txt(c.name,300,y+15,17,RAYWHITE);Txt(to_string(c.pts)+" pts",850,y+15,17,GOLD); y+=54;rank++;}
+        Txt(to_string(rank),255,y+15,16,MUTED);Txt(c.name,300,y+15,17,RAYWHITE);Txt(to_string(c.pts)+" pts",850,y+15,17,GOLD_C); y+=54;rank++;}
 }
 void Schedule(){
     Txt("FIXTURES & RESULTS",235,100,30,RAYWHITE);
@@ -157,7 +157,7 @@ void NewCareer(){
     int x=65,y=155;
     for(int i=0;i<(int)clubs.size();i++){
         Rectangle r=R(x,y,270,150);DrawRectangleRounded(r,.07f,8,PANEL);DrawRectangleRoundedLinesEx(r,.07f,8,1,Color{50,66,84,255});
-        DrawCircle(x+45,y+47,24,i==0?ACCENT:GOLD);Txt(clubs[i].name,x+80,y+28,19,RAYWHITE);Txt("Rating "+to_string(clubs[i].rating),x+80,y+58,15,MUTED);
+        DrawCircle(x+45,y+47,24,i==0?ACCENT:GOLD_C);Txt(clubs[i].name,x+80,y+28,19,RAYWHITE);Txt("Rating "+to_string(clubs[i].rating),x+80,y+58,15,MUTED);
         Txt("Budget £"+to_string(clubs[i].budget)+"M",x+20,y+100,16,RAYWHITE);
         if(CheckCollisionPointRec(GetMousePosition(),r)&&IsMouseButtonPressed(MOUSE_LEFT_BUTTON)){clubIndex=i;screen=DASHBOARD;}
         x+=295;if(x>1000){x=65;y+=180;}
