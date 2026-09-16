@@ -1,0 +1,71 @@
+name: Build and deploy DUMOK FM
+
+on:
+  push:
+    branches: ["main", "master"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Emscripten
+        uses: mymindstorm/setup-emsdk@v14
+        with:
+          version: latest
+          actions-cache-folder: emsdk-cache
+
+      - name: Configure
+        run: emcmake cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DPLATFORM=Web
+
+      - name: Build
+        run: cmake --build build -j2
+
+      - name: Prepare site
+        shell: bash
+        run: |
+          mkdir -p site
+          HTML="$(find build -type f -name '*.html' | head -n 1)"
+          JS="$(find build -type f -name '*.js' | head -n 1)"
+          WASM="$(find build -type f -name '*.wasm' | head -n 1)"
+          if [ -z "$HTML" ] || [ -z "$JS" ] || [ -z "$WASM" ]; then
+            echo "Web build files not found"
+            find build -maxdepth 4 -type f
+            exit 1
+          fi
+          cp "$HTML" site/index.html
+          cp "$JS" site/
+          cp "$WASM" site/
+          find build -type f \( -name '*.data' -o -name '*.mem' -o -name '*.worker.js' \) -exec cp {} site/ \;
+          touch site/.nojekyll
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy
+        id: deployment
+        uses: actions/deploy-pages@v4
