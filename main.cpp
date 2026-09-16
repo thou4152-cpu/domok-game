@@ -4,6 +4,9 @@
 #include <string>
 #include <algorithm>
 #include <cmath>
+#ifdef __EMSCRIPTEN__
+#include <emscripten/emscripten.h>
+#endif
 using namespace std;
 
 struct Player {
@@ -164,17 +167,40 @@ void NewCareer(){
     }
     if(Btn(R(65,640,150,45),"BACK")) screen=TITLE;
 }
+void GameFrame(){
+    BeginDrawing();
+    ClearBackground(BG);
+    if(screen==TITLE) Title();
+    else if(screen==NEW_CAREER) NewCareer();
+    else {
+        Header();
+        Sidebar();
+        if(screen==DASHBOARD) Dashboard();
+        else if(screen==SQUAD) Squad();
+        else if(screen==TRANSFERS) Transfers();
+        else if(screen==LEAGUE) League();
+        else Schedule();
+    }
+    if(toastT>0){
+        toastT-=GetFrameTime();
+        DrawRectangleRounded(R(455,655,370,42),.3f,8,Color{0,0,0,210});
+        int w=MeasureText(toast.c_str(),16);
+        Txt(toast,640-w/2,668,16,RAYWHITE);
+    }
+    EndDrawing();
+}
+
 int main(){
     SetConfigFlags(FLAG_WINDOW_RESIZABLE|FLAG_MSAA_4X_HINT);
     InitWindow(1280,720,"DUMOK Football Manager v0.3");
-    SetTargetFPS(60); Seed();
-    while(!WindowShouldClose()){
-        BeginDrawing();ClearBackground(BG);
-        if(screen==TITLE) Title();
-        else if(screen==NEW_CAREER) NewCareer();
-        else {Header();Sidebar(); if(screen==DASHBOARD)Dashboard(); else if(screen==SQUAD)Squad(); else if(screen==TRANSFERS)Transfers(); else if(screen==LEAGUE)League(); else Schedule();}
-        if(toastT>0){toastT-=GetFrameTime();DrawRectangleRounded(R(455,655,370,42),.3f,8,Color{0,0,0,210});int w=MeasureText(toast.c_str(),16);Txt(toast,640-w/2,668,16,RAYWHITE);}
-        EndDrawing();
-    }
-    CloseWindow(); return 0;
+    SetTargetFPS(60);
+    Seed();
+
+#ifdef __EMSCRIPTEN__
+    emscripten_set_main_loop(GameFrame, 0, 1);
+#else
+    while(!WindowShouldClose()) GameFrame();
+    CloseWindow();
+#endif
+    return 0;
 }
