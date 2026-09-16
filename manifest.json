@@ -1,0 +1,9 @@
+{
+  "name": "두목 게임즈",
+  "short_name": "두목게임즈",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#dfe8d5",
+  "theme_color": "#252525",
+  "icons": []
+}
